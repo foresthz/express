@@ -1,27 +1,27 @@
 
 var assert = require('assert');
+var Buffer = require('safe-buffer').Buffer
 var utils = require('../lib/utils');
 
 describe('utils.etag(body, encoding)', function(){
   it('should support strings', function(){
     utils.etag('express!')
-    .should.eql('"zZdv4imtWD49AHEviejT6A=="')
+    .should.eql('"8-O2uVAFaQ1rZvlKLT14RnuvjPIdg"')
   })
 
   it('should support utf8 strings', function(){
     utils.etag('express❤', 'utf8')
-    .should.eql('"fsFba4IxwQS6h6Umb+FNxw=="')
+    .should.eql('"a-JBiXf7GyzxwcrxY4hVXUwa7tmks"')
   })
 
   it('should support buffer', function(){
-    var buf = new Buffer('express!')
-    utils.etag(buf)
-    .should.eql('"zZdv4imtWD49AHEviejT6A=="');
+    utils.etag(Buffer.from('express!'))
+    .should.eql('"8-O2uVAFaQ1rZvlKLT14RnuvjPIdg"')
   })
 
   it('should support empty string', function(){
     utils.etag('')
-    .should.eql('"1B2M2Y8AsgTpgAmY7PhCfg=="');
+    .should.eql('"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"')
   })
 })
 
@@ -50,29 +50,29 @@ describe('utils.setCharset(type, charset)', function () {
 describe('utils.wetag(body, encoding)', function(){
   it('should support strings', function(){
     utils.wetag('express!')
-    .should.eql('W/"8-b8aabac7"')
+    .should.eql('W/"8-O2uVAFaQ1rZvlKLT14RnuvjPIdg"')
   })
 
   it('should support utf8 strings', function(){
     utils.wetag('express❤', 'utf8')
-    .should.eql('W/"a-686b0af1"')
+    .should.eql('W/"a-JBiXf7GyzxwcrxY4hVXUwa7tmks"')
   })
 
   it('should support buffer', function(){
-    var buf = new Buffer('express!')
-    utils.wetag(buf)
-    .should.eql('W/"8-b8aabac7"');
+    utils.wetag(Buffer.from('express!'))
+    .should.eql('W/"8-O2uVAFaQ1rZvlKLT14RnuvjPIdg"')
   })
 
   it('should support empty string', function(){
     utils.wetag('')
-    .should.eql('W/"0-0"');
+    .should.eql('W/"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"')
   })
 })
 
 describe('utils.isAbsolute()', function(){
   it('should support windows', function(){
     assert(utils.isAbsolute('c:\\'));
+    assert(utils.isAbsolute('c:/'));
     assert(!utils.isAbsolute(':\\'));
   })
 

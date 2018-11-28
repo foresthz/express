@@ -4,12 +4,12 @@ var express = require('../')
 
 describe('req', function(){
   describe('.acceptsEncodingss', function(){
-    it('should be true if encoding accpeted', function(done){
+    it('should be true if encoding accepted', function(done){
       var app = express();
 
       app.use(function(req, res){
-        req.acceptsEncodings('gzip').should.be.ok;
-        req.acceptsEncodings('deflate').should.be.ok;
+        req.acceptsEncodings('gzip').should.be.ok()
+        req.acceptsEncodings('deflate').should.be.ok()
         res.end();
       });
 
@@ -19,11 +19,11 @@ describe('req', function(){
       .expect(200, done);
     })
 
-    it('should be false if encoding not accpeted', function(done){
+    it('should be false if encoding not accepted', function(done){
       var app = express();
 
       app.use(function(req, res){
-        req.acceptsEncodings('bogus').should.not.be.ok;
+        req.acceptsEncodings('bogus').should.not.be.ok()
         res.end();
       });
 

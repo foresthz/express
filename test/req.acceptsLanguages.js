@@ -4,12 +4,12 @@ var express = require('../')
 
 describe('req', function(){
   describe('.acceptsLanguages', function(){
-    it('should be true if language accpeted', function(done){
+    it('should be true if language accepted', function(done){
       var app = express();
 
       app.use(function(req, res){
-        req.acceptsLanguages('en-us').should.be.ok;
-        req.acceptsLanguages('en').should.be.ok;
+        req.acceptsLanguages('en-us').should.be.ok()
+        req.acceptsLanguages('en').should.be.ok()
         res.end();
       });
 
@@ -19,11 +19,11 @@ describe('req', function(){
       .expect(200, done);
     })
 
-    it('should be false if language not accpeted', function(done){
+    it('should be false if language not accepted', function(done){
       var app = express();
 
       app.use(function(req, res){
-        req.acceptsLanguages('es').should.not.be.ok;
+        req.acceptsLanguages('es').should.not.be.ok()
         res.end();
       });
 
@@ -38,9 +38,9 @@ describe('req', function(){
         var app = express();
 
         app.use(function(req, res){
-          req.acceptsLanguages('en').should.be.ok;
-          req.acceptsLanguages('es').should.be.ok;
-          req.acceptsLanguages('jp').should.be.ok;
+          req.acceptsLanguages('en').should.be.ok()
+          req.acceptsLanguages('es').should.be.ok()
+          req.acceptsLanguages('jp').should.be.ok()
           res.end();
         });
 

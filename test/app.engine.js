@@ -1,6 +1,7 @@
 
 var express = require('../')
   , fs = require('fs');
+var path = require('path')
 
 function render(path, options, fn) {
   fs.readFile(path, 'utf8', function(err, str){
@@ -15,7 +16,7 @@ describe('app', function(){
     it('should map a template engine', function(done){
       var app = express();
 
-      app.set('views', __dirname + '/fixtures');
+      app.set('views', path.join(__dirname, 'fixtures'))
       app.engine('.html', render);
       app.locals.user = { name: 'tobi' };
 
@@ -36,7 +37,7 @@ describe('app', function(){
     it('should work without leading "."', function(done){
       var app = express();
 
-      app.set('views', __dirname + '/fixtures');
+      app.set('views', path.join(__dirname, 'fixtures'))
       app.engine('html', render);
       app.locals.user = { name: 'tobi' };
 
@@ -46,11 +47,11 @@ describe('app', function(){
         done();
       })
     })
-    
+
     it('should work "view engine" setting', function(done){
       var app = express();
 
-      app.set('views', __dirname + '/fixtures');
+      app.set('views', path.join(__dirname, 'fixtures'))
       app.engine('html', render);
       app.set('view engine', 'html');
       app.locals.user = { name: 'tobi' };
@@ -61,11 +62,11 @@ describe('app', function(){
         done();
       })
     })
-    
+
     it('should work "view engine" with leading "."', function(done){
       var app = express();
 
-      app.set('views', __dirname + '/fixtures');
+      app.set('views', path.join(__dirname, 'fixtures'))
       app.engine('.html', render);
       app.set('view engine', '.html');
       app.locals.user = { name: 'tobi' };

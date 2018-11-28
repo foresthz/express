@@ -8,7 +8,7 @@ describe('app', function(){
       var app = express();
 
       app.param(function(name, regexp){
-        if (Object.prototype.toString.call(regexp) == '[object RegExp]') { // See #1557
+        if (Object.prototype.toString.call(regexp) === '[object RegExp]') { // See #1557
           return function(req, res, next, val){
             var captures;
             if (captures = regexp.exec(String(val))) {
@@ -29,8 +29,8 @@ describe('app', function(){
 
       request(app)
       .get('/user/tj')
-      .end(function(err, res){
-        res.text.should.equal('tj');
+      .expect(200, 'tj', function (err) {
+        if (err) return done(err)
         request(app)
         .get('/user/123')
         .expect(404, done);
@@ -57,21 +57,20 @@ describe('app', function(){
 
       app.get('/post/:id', function(req, res){
         var id = req.params.id;
-        id.should.be.a.Number;
+        id.should.be.a.Number()
         res.send('' + id);
       });
 
       app.get('/user/:uid', function(req, res){
         var id = req.params.id;
-        id.should.be.a.Number;
+        id.should.be.a.Number()
         res.send('' + id);
       });
 
       request(app)
       .get('/user/123')
-      .end(function(err, res){
-        res.text.should.equal('123');
-
+      .expect(200, '123', function (err) {
+        if (err) return done(err)
         request(app)
         .get('/post/123')
         .expect('123', done);
@@ -92,7 +91,7 @@ describe('app', function(){
 
       app.get('/user/:id', function(req, res){
         var id = req.params.id;
-        id.should.be.a.Number;
+        id.should.be.a.Number()
         res.send('' + id);
       });
 
@@ -302,6 +301,66 @@ describe('app', function(){
       request(app)
       .get('/user/new')
       .expect('get.new', done);
+    })
+
+    it('should not call when values differ on error', function(done) {
+      var app = express();
+      var called = 0;
+      var count = 0;
+
+      app.param('user', function(req, res, next, user) {
+        called++;
+        if (user === 'foo') throw new Error('err!');
+        req.user = user;
+        next();
+      });
+
+      app.get('/:user/bob', function(req, res, next) {
+        count++;
+        next();
+      });
+      app.get('/foo/:user', function(req, res, next) {
+        count++;
+        next();
+      });
+
+      app.use(function(err, req, res, next) {
+        res.status(500);
+        res.send([count, called, err.message].join(' '));
+      });
+
+      request(app)
+      .get('/foo/bob')
+      .expect(500, '0 1 err!', done)
+    });
+
+    it('should call when values differ when using "next"', function(done) {
+      var app = express();
+      var called = 0;
+      var count = 0;
+
+      app.param('user', function(req, res, next, user) {
+        called++;
+        if (user === 'foo') return next('route');
+        req.user = user;
+        next();
+      });
+
+      app.get('/:user/bob', function(req, res, next) {
+        count++;
+        next();
+      });
+      app.get('/foo/:user', function(req, res, next) {
+        count++;
+        next();
+      });
+      app.use(function(req, res) {
+        res.end([count, called, req.user].join(' '));
+      });
+
+      request(app)
+      .get('/foo/bob')
+      .expect('1 2 bob', done);
     })
   })
 })

@@ -2,6 +2,7 @@
 var express = require('../')
   , request = require('supertest')
   , assert = require('assert');
+var utils = require('./support/utils');
 
 describe('res', function(){
   describe('.jsonp(object)', function(){
@@ -136,11 +137,8 @@ describe('res', function(){
       request(app)
       .get('/')
       .expect('Content-Type', 'application/vnd.example+json; charset=utf-8')
-      .expect(200, '{"hello":"world"}', function (err, res) {
-        if (err) return done(err);
-        res.headers.should.not.have.property('x-content-type-options');
-        done();
-      });
+      .expect(utils.shouldNotHaveHeader('X-Content-Type-Options'))
+      .expect(200, '{"hello":"world"}', done);
     })
 
     it('should override previous Content-Types with callback', function(done){
@@ -244,12 +242,34 @@ describe('res', function(){
       })
     })
 
+    describe('"json escape" setting', function () {
+      it('should be undefined by default', function () {
+        var app = express()
+        assert.strictEqual(app.get('json escape'), undefined)
+      })
+
+      it('should unicode escape HTML-sniffing characters', function (done) {
+        var app = express()
+
+        app.enable('json escape')
+
+        app.use(function (req, res) {
+          res.jsonp({ '&': '\u2028<script>\u2029' })
+        })
+
+        request(app)
+        .get('/?callback=foo')
+        .expect('Content-Type', 'text/javascript; charset=utf-8')
+        .expect(200, /foo\({"\\u0026":"\\u2028\\u003cscript\\u003e\\u2029"}\)/, done)
+      })
+    })
+
     describe('"json replacer" setting', function(){
       it('should be passed to JSON.stringify()', function(done){
         var app = express();
 
         app.set('json replacer', function(key, val){
-          return '_' == key[0]
+          return key[0] === '_'
             ? undefined
             : val;
         });

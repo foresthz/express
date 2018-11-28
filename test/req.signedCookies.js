@@ -11,7 +11,7 @@ describe('req', function(){
       app.use(cookieParser('secret'));
 
       app.use(function(req, res){
-        if ('/set' == req.path) {
+        if (req.path === '/set') {
           res.cookie('obj', { foo: 'bar' }, { signed: true });
           res.end();
         } else {
@@ -28,11 +28,7 @@ describe('req', function(){
         request(app)
         .get('/')
         .set('Cookie', cookie)
-        .end(function(err, res){
-          if (err) return done(err);
-          res.body.should.eql({ obj: { foo: 'bar' } });
-          done();
-        });
+        .expect(200, { obj: { foo: 'bar' } }, done)
       });
     })
   })
